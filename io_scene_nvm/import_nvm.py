@@ -5,8 +5,11 @@ import logging
 
 import bpy
 from mathutils import Quaternion
+from mathutils import Euler
 from mathutils import Vector
 from mathutils import Color
+from mathutils import Matrix
+from math import radians
 
 
 class Camera(object):
@@ -31,6 +34,7 @@ class Camera(object):
     def set_rotation(self):
         """Set the rotation of the camera."""
         # TODO
+        # Copied form pba source code
         qq = sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3])
         if qq > 0:
             qw=q[0] / qq
@@ -49,6 +53,16 @@ class Camera(object):
         m[2][0]=float_t(2*qx*qz- 2*qy*qw);
         m[2][1]=float_t(2*qy*qz + 2*qw*qx );
         m[2][2]=float_t(qz*qz+ qw*qw- qy*qy- qx*qx);
+
+
+        # Copied form vcglib source code
+        mat[1][0]=-mat[1][0];
+        mat[1][1]=-mat[1][1];
+        mat[1][2]=-mat[1][2];
+
+        mat[2][0]=-mat[2][0];
+        mat[2][1]=-mat[2][1];
+        mat[2][2]=-mat[2][2];
 
     def set_center_after_rotation(self):
         """Set the camera center after rotation."""
@@ -154,7 +168,20 @@ class NViewMatch(object):
             camera_obj = bpy.data.objects.new(name, camera_data)
             camera_obj.location = camera.get("camera_center", Vector((0, 0, 0)))
             camera_obj.rotation_mode = 'QUATERNION'
-            camera_obj.rotation_quaternion = camera.get("rotation", Quaternion((1, 0, 0, 0)))
+            quaternion = camera.get("rotation", Quaternion((1, 0, 0, 0)))
+            # Matrix manipulation
+            mat = quaternion.to_matrix()
+            mat[1][0] = -mat[1][0];
+            mat[1][1] = -mat[1][1];
+            mat[1][2] = -mat[1][2];
+            mat[2][0] = -mat[2][0];
+            mat[2][1] = -mat[2][1];
+            mat[2][2] = -mat[2][2];
+            rotate_90x = Euler((radians(90), 0, 0)).to_matrix()
+            mat.rotate(rotate_90x)
+            quaternion = mat.to_quaternion()
+            # End of manipulation
+            camera_obj.rotation_quaternion = quaternion
             bpy.context.scene.objects.link(camera_obj)
 
     def create_points(self):
