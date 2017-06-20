@@ -140,7 +140,7 @@ class NViewMatch(object):
                     }
                 self.point_data.append(point)
 
-    def create_camera(self):
+    def create_cameras(self):
         """Create the cameras in Blender."""
         for i, camera in enumerate(self.camera_data):
             name = camera.get("name")
