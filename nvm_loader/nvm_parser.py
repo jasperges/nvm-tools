@@ -8,6 +8,53 @@ from mathutils import Vector
 from mathutils import Color
 
 
+class Camera(object):
+    """A class that represents the camera from an .nvm file.
+
+    Args:
+        name (str): The name of the camera (filename).
+        focal_length (float): The focal length in pixels.
+        rotation (Quaternion): Quaternion rotation of the camera.
+        camera_center (Vector): Center of camera in 2D (x, y).
+        distortion (Vector): k1 and k2 of the camera lens distortion model.
+    """
+
+    def __init__(self, name, focal_length, rotation, camera_center, distortion):
+        self.logger = logging.getLogger("Camera")
+        self.name = name
+        self.focal_length = focal_length
+        self. rotation = rotation
+        self.camera_center = camera_data
+        self.distortion = distortion
+
+    def set_rotation(self):
+        """Set the rotation of the camera."""
+        # TODO
+        qq = sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3])
+        if qq > 0:
+            qw=q[0] / qq
+            qx=q[1] / qq
+            qy=q[2] / qq
+            qz=q[3] / qq
+        else:
+            qw = 1
+            qx = qy = qz = 0
+        m[0][0]=float_t(qw*qw + qx*qx- qz*qz- qy*qy );
+        m[0][1]=float_t(2*qx*qy -2*qz*qw );
+        m[0][2]=float_t(2*qy*qw + 2*qz*qx);
+        m[1][0]=float_t(2*qx*qy+ 2*qw*qz);
+        m[1][1]=float_t(qy*qy+ qw*qw - qz*qz- qx*qx);
+        m[1][2]=float_t(2*qz*qy- 2*qx*qw);
+        m[2][0]=float_t(2*qx*qz- 2*qy*qw);
+        m[2][1]=float_t(2*qy*qz + 2*qw*qx );
+        m[2][2]=float_t(qz*qz+ qw*qw- qy*qy- qx*qx);
+
+    def set_center_after_rotation(self):
+        """Set the camera center after rotation."""
+        # TODO
+        pass
+
+
 class NViewMatch(object):
     """A class that represents the N-View Match from an .nvm file.
 
