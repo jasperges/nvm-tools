@@ -25,7 +25,7 @@ class Camera(object):
         self.name = name
         self.focal_length = focal_length
         self. rotation = rotation
-        self.camera_center = camera_data
+        self.camera_center = camera_center
         self.distortion = distortion
 
     def set_rotation(self):
@@ -83,7 +83,7 @@ class NViewMatch(object):
         with open(self.nvm_filepath, "r") as nvm_file:
             file_header = nvm_file.readline()
             if not file_header.startswith("NVM_V3"):
-                self.logger.error("Invalid file header: %", file_header)
+                self.logger.error("Invalid file header: %s", file_header)
                 raise TypeError("Invalid file header: {0}".format(file_header))
             if "R9T" in file_header:
                 rotation_parameter_num = 9
