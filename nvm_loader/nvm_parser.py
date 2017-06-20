@@ -3,6 +3,7 @@
 import os
 import logging
 
+import bpy
 from mathutils import Quaternion
 from mathutils import Vector
 from mathutils import Color
@@ -96,11 +97,12 @@ class NViewMatch(object):
             for i in range(ncam):
                 camera_info = nvm_file.readline().split()
                 token, f = camera_info[:2]
+                f = float(f)
                 q = camera_info[2: 2 + rotation_parameter_num]
                 q = [float(i) for i in q]
                 # TODO: r9t format with matrix rotation is not supported yet.
                 q = Quaternion(q)
-                c = camera_info[2 + rotation_parameter_num: 2 + rotation_parameter_num + 2]
+                c = camera_info[2 + rotation_parameter_num: 2 + rotation_parameter_num + 3]
                 c = [float(i) for i in c]
                 c = Vector(c)
                 d = camera_info[2 + rotation_parameter_num + 2: 2 + rotation_parameter_num + 4]
@@ -138,6 +140,33 @@ class NViewMatch(object):
                     }
                 self.point_data.append(point)
 
+    def create_camera(self):
+        """Create the cameras in Blender."""
+        for i, camera in enumerate(self.camera_data):
+            name = camera.get("name")
+            if name:
+                name = os.path.basename(name)
+            else:
+                name = "nvm_camera.{0:03d}".format(i)
+            camera_data = bpy.data.cameras.new(name)
+            # TODO: figure out correct focal length in Blender
+            # camera_data.lens = camera.get("focal_length", 35.0)
+            camera_obj = bpy.data.objects.new(name, camera_data)
+            print("Creating camera at location {}".format(camera.get("camera_center", Vector((0, 0, 0)))))
+            camera_obj.location = camera.get("camera_center", Vector((0, 0, 0)))
+            camera_obj.rotation_mode = 'QUATERNION'
+            camera_obj.rotation_quaternion = camera.get("rotation", Quaternion((1, 0, 0, 0)))
+            bpy.context.scene.objects.link(camera_obj)
+
+    def create_points(self):
+        """Create the 3d points."""
+        name = os.path.splitext(os.path.basename(self.nvm_filepath))[0]
+        point_mesh = bpy.data.meshes.new(name)
+        point_mesh.vertices.add(count=len(self.point_data))
+        for vertex, point in zip(point_mesh.vertices, self.point_data):
+            vertex.co = point.get("location", Vector((0, 0, 0)))
+        point_obj = bpy.data.objects.new(name, point_mesh)
+        bpy.context.scene.objects.link(point_obj)
 
 # bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<Point3D>& point_data,
 #               vector<Point2D>& measurements, vector<int>& ptidx, vector<int>& camidx,
