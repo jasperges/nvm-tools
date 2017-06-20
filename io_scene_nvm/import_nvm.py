@@ -152,7 +152,6 @@ class NViewMatch(object):
             # TODO: figure out correct focal length in Blender
             # camera_data.lens = camera.get("focal_length", 35.0)
             camera_obj = bpy.data.objects.new(name, camera_data)
-            print("Creating camera at location {}".format(camera.get("camera_center", Vector((0, 0, 0)))))
             camera_obj.location = camera.get("camera_center", Vector((0, 0, 0)))
             camera_obj.rotation_mode = 'QUATERNION'
             camera_obj.rotation_quaternion = camera.get("rotation", Quaternion((1, 0, 0, 0)))
