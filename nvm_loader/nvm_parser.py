@@ -18,13 +18,13 @@ class NViewMatch(object):
     """
 
     def __init__(self, nvm_filepath):
-        self._logger = logging.getLogger("NViewMatch")
+        self.logger = logging.getLogger("NViewMatch")
         if not os.path.isfile(os.path.normpath(nvm_filepath)):
-            self._logger.error("NVM file not found: %s", nvm_filepath)
+            self.logger.error("NVM file not found: %s", nvm_filepath)
             raise FileNotFoundError("NVM file not found: {0}".format(nvm_filepath))
-        self._nvm_filepath = nvm_filepath
-        self._camera_data = []
-        self._point_data = []
+        self.nvm_filepath = nvm_filepath
+        self.camera_data = []
+        self.point_data = []
 
     def load(self):
         """Load the nvm file. This can take some time."""
@@ -32,10 +32,10 @@ class NViewMatch(object):
         rotation_parameter_num = 4
         format_r9t = False
 
-        with open(self._nvm_filepath, "r") as nvm_file:
+        with open(self.nvm_filepath, "r") as nvm_file:
             file_header = nvm_file.readline()
             if not file_header.startswith("NVM_V3"):
-                self._logger.error("Invalid file header: %", file_header)
+                self.logger.error("Invalid file header: %", file_header)
                 raise TypeError("Invalid file header: {0}".format(file_header))
             if "R9T" in file_header:
                 rotation_parameter_num = 9
@@ -44,7 +44,7 @@ class NViewMatch(object):
             nvm_file.readline()     # Empty line
             ncam = int(nvm_file.readline())
             if ncam <= 1:
-                self._logger.warning("No cameras found.")
+                self.logger.warning("No cameras found.")
                 return
             for i in range(ncam):
                 camera_info = nvm_file.readline().split()
@@ -69,11 +69,11 @@ class NViewMatch(object):
                     'camera_center': c,
                     'distortion': d,
                     }
-                self._camera_data.append(camera)
+                self.camera_data.append(camera)
             nvm_file.readline()     # Empty line
             npoint = int(nvm_file.readline())
             if npoint <= 1:
-                self._logger.warning("No 3D points found.")
+                self.logger.warning("No 3D points found.")
                 return
             for i in range(npoint):
                 # TODO: for now I totally don't care about the measurements
@@ -89,7 +89,7 @@ class NViewMatch(object):
                     'location': pt,
                     'color': cc,
                     }
-                self._point_data.append(point)
+                self.point_data.append(point)
 
 
 # bool LoadNVM(ifstream& in, vector<CameraT>& camera_data, vector<Point3D>& point_data,
